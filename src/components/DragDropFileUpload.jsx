@@ -19,15 +19,36 @@ const DragDropFileUpload = () => {
   });
 
   const handleSubmit = () => {
+    if (!file) return;
+
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      alert('File uploaded successfully!');
-    }, 2000); // Simulate a file upload delay
+
+    // Create a new FormData object
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Set the request options
+    const requestOptions = {
+      method: 'POST',
+      body: formData,
+      redirect: 'follow',
+    };
+
+    // Perform the fetch request
+    fetch('http://127.0.0.1:80/uploadImage', requestOptions)
+      .then((response) => response.text())
+      .then((result) => {
+        console.log(result);
+        setLoading(false); // Stop loading after upload
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        setLoading(false); // Stop loading on error
+      });
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-900">
+    <div className="flex items-center justify-center h-screen">
       <div
         {...getRootProps()}
         className={`w-80 p-6 rounded-lg shadow-lg border-dashed border-2 ${

@@ -5,8 +5,8 @@ function App() {
 
   return (
     <>
-      <div>
-      <DragDropFileUpload />
+      <div className='bg-gray-900'>
+        <DragDropFileUpload />
       </div>
     </>
   )
