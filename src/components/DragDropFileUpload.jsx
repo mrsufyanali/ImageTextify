@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { ClipLoader } from 'react-spinners';
+import {uploadIcon}  from '../assets';
 
-const DragDropFileUpload = () => {
+const DragDropFileUpload = ({ocrSuccess, setOcrSuccess,ocrData, setOcrData,setPreview}) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -15,6 +16,8 @@ const DragDropFileUpload = () => {
           preview: URL.createObjectURL(acceptedFiles[0]),
         })
       );
+      // setting preview to show in next page
+      setPreview(URL.createObjectURL(acceptedFiles[0]))
     },
   });
 
@@ -38,8 +41,10 @@ const DragDropFileUpload = () => {
     fetch('http://127.0.0.1:80/uploadImage', requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
+        console.log(result.solution);
         setLoading(false); // Stop loading after upload
+        setOcrSuccess(true);
+        setOcrData(result.solution)
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -51,14 +56,17 @@ const DragDropFileUpload = () => {
     <div className="flex items-center justify-center h-screen">
       <div
         {...getRootProps()}
-        className={`w-80 p-6 rounded-lg shadow-lg border-dashed border-2 ${
-          isDragActive ? 'border-blue-500' : 'border-gray-600'
-        } bg-gray-800 flex flex-col items-center justify-center`}
+        className={`w-80 p-6 rounded-lg shadow-lg border-dashed border-2 transition-all duration-150 ease-in-out ${
+          isDragActive ? 'border-blue-500  h-[100vh] w-[100vw]' : 'border-gray-600'
+        } bg-gray-800 flex flex-col items-center justify-center `}
       >
         <input {...getInputProps()} />
         <div className="text-white">
           {isDragActive ? (
-            <p>Drop the files here...</p>
+            <div className="flex flex-col items-center justify-center">
+              <img src={uploadIcon} className='w-20' alt="upload icon" srcset="" />
+              <p>Drop the files here...</p>
+            </div>
           ) : (
             <p>Drag n drop some files here, or click to select files</p>
           )}
