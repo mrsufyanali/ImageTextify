@@ -38,7 +38,7 @@ const DragDropFileUpload = ({ocrSuccess, setOcrSuccess,ocrData, setOcrData,setPr
     };
 
     // Perform the fetch request
-    fetch('http://127.0.0.1:80/uploadImage', requestOptions)
+    fetch('https://imagetextify-1-0-1.onrender.com/uploadImage', requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result.solution);
