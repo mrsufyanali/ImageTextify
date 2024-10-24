@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BoxOverlay = ({ left, top, width, height, text }) => {
+const BoxOverlay = ({ left, top, width, height, text,onClick }) => {
     return (
         <>
             <div
@@ -15,6 +15,7 @@ const BoxOverlay = ({ left, top, width, height, text }) => {
                     backgroundColor: 'rgba(23, 57, 84, 0.2)',  // Semi-transparent background for visibility
                     cursor:'pointer'
                 }}
+                onClick={onClick}
             >
                 {/* Hidden text inside the box for accessibility */}
                 <span className="sr-only">{text}</span>

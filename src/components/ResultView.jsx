@@ -5,6 +5,7 @@ const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview })
     const imgRef = useRef(null);  // To access the image DOM element
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [scaledData, setScaledData] = useState([]);
+    const [selectedBox, setSelectedBox] = useState(null);  // Track selected box index
 
     // Function to calculate new positions and dimensions
     const calculateScaledData = () => {
@@ -58,6 +59,11 @@ const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview })
         };
     }, [ocrData, imageSize]); // Rerun if OCR data or image size changes
 
+    // Function to handle box click
+    const handleBoxClick = (index) => {
+        setSelectedBox(index);
+    };
+
     return (
         <>
             <div className="h-screen w-screen flex justify-center items-center text-slate-200">
@@ -72,6 +78,7 @@ const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview })
                                 URL.revokeObjectURL(preview); // Clean up after previewing
                             }}
                             alt="Preview"
+                            onClick={() => setSelectedBox(null)}
                         />
                         {/* Overlay boxes for OCR data */}
                         {scaledData.map((data, index) => (
@@ -82,12 +89,16 @@ const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview })
                                 width={data.newWidth}
                                 height={data.newHeight}
                                 text={data.text}
+                                onClick={() => handleBoxClick(index)}  // Handle click on the box
                             />
                         ))}
                     </div>
                     <div className="w-2/4 h-full border-2 border-indigo-500/75 p-4 overflow-y-auto">
                         {scaledData.map((data, index) => (
-                            <span key={index} className="mr-2">
+                            <span
+                                key={index}
+                                className={`mr-2 transition duration-300 ease-in-out ${(selectedBox === index && selectedBox != null) ? 'text-white' : 'text-gray-500'}`}  // Apply bright or dull white based on selection
+                            >
                                 {data.text}
                             </span>
                         ))}
