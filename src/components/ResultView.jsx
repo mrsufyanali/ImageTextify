@@ -1,28 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import BoxOverlay from './BoxOverlay';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview }) => {
-    const imgRef = useRef(null);  // To access the image DOM element
+    const imgRef = useRef(null);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [scaledData, setScaledData] = useState([]);
-    const [selectedBox, setSelectedBox] = useState(null);  // Track selected box index
+    const [selectedBox, setSelectedBox] = useState(null);
+    const [copiedText, setCopiedText] = useState('');  // To store all the OCR text
 
     // Function to calculate new positions and dimensions
     const calculateScaledData = () => {
         const img = imgRef.current;
         if (!img) return;
 
-        // Get the actual and displayed image sizes
         const displayedWidth = img.clientWidth;
         const displayedHeight = img.clientHeight;
         const actualWidth = img.naturalWidth;
         const actualHeight = img.naturalHeight;
 
-        // Calculate scale factors
         const widthRatio = displayedWidth / actualWidth;
         const heightRatio = displayedHeight / actualHeight;
 
-        // Update each OCR data's position and size
         const updatedData = ocrData.map((data) => ({
             ...data,
             newLeft: data.left * widthRatio,
@@ -43,11 +44,10 @@ const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview })
                     width: img.naturalWidth,
                     height: img.naturalHeight,
                 });
-                calculateScaledData(); // Recalculate positions after image is loaded
+                calculateScaledData();
             };
         }
 
-        // Recalculate positions when the window is resized
         const handleResize = () => {
             calculateScaledData();
         };
@@ -55,25 +55,36 @@ const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview })
         window.addEventListener('resize', handleResize);
 
         return () => {
-            window.removeEventListener('resize', handleResize); // Clean up listener
+            window.removeEventListener('resize', handleResize);
         };
-    }, [ocrData, imageSize]); // Rerun if OCR data or image size changes
+    }, [ocrData, imageSize]);
 
     // Function to handle box click
     const handleBoxClick = (index) => {
         setSelectedBox(index);
     };
 
+    // Collect all the OCR text into one string for copying
+    useEffect(() => {
+        const allText = scaledData.map((data) => data.text).join(' ');
+        setCopiedText(allText);
+    }, [scaledData]);
+
+    // Function to handle the "Copy to Clipboard" action
+    const handleCopy = () => {
+        toast.success("Text copied to clipboard!", { position: 'bottom-right' });
+    };
+
     return (
         <>
-            <div className="h-screen w-screen flex justify-center items-center text-slate-200">
-                <div className="relative w-3/4 h-full py-3 flex justify-center items-center">
+            <div className="h-screen w-screen flex flex-col justify-center items-center text-slate-200">
+                <div className="relative flex flex-col md:flex-row md:space-x-6 w-full max-w-7xl h-full py-3 justify-center items-center">
                     {/* Image with overlay container */}
-                    <div className="w-2/4 flex justify-center relative">
+                    <div className="relative flex justify-center w-full md:w-2/4 max-h-full">
                         <img
                             ref={imgRef}
                             src={preview}
-                            className="w-100 mr-2 object-cover border-2 border-indigo-500/75 shadow-lg border-dashed"
+                            className="w-full h-auto object-cover border-2 border-indigo-500/75 shadow-lg border-dashed"
                             onLoad={() => {
                                 URL.revokeObjectURL(preview); // Clean up after previewing
                             }}
@@ -93,17 +104,41 @@ const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview })
                             />
                         ))}
                     </div>
-                    <div className="w-2/4 h-full border-2 border-indigo-500/75 p-4 overflow-y-auto">
-                        {scaledData.map((data, index) => (
-                            <span
-                                key={index}
-                                className={`mr-2 transition duration-300 ease-in-out ${(selectedBox === index && selectedBox != null) ? 'text-white' : 'text-gray-500'}`}  // Apply bright or dull white based on selection
+
+                    {/* Text and Copy button */}
+                    <div className="relative w-full md:w-2/4 h-full border-2 border-indigo-500/75 p-4 overflow-y-hidden overflow-x-hidden ">
+                        <div className="content mb-24 h-full overflow-y-auto overflow-x-hidden "> {/* Added mb-16 to prevent content overlap with the button */}
+                            {scaledData.map((data, index) => (
+                                <span
+                                    key={index}
+                                    className={`mr-2 transition duration-300 ease-in-out ${(selectedBox === index && selectedBox != null) ? 'text-white' : 'text-gray-500'}`}  // Apply bright or dull white based on selection
+                                >
+                                    {data.text}
+                                </span>
+
+                            ))}
+                            <br />
+                            <br />
+                            <br />
+                        </div>
+                        {/* Copy to Clipboard button - stays at the bottom of the container */}
+                        <div className="absolute bottom-4 right-4 ">
+                            <button 
+                            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none mr-2"
+                            onClick={()=>setOcrSuccess(false)}
                             >
-                                {data.text}
-                            </span>
-                        ))}
+                                Back
+                            </button>
+                            <CopyToClipboard text={copiedText} onCopy={handleCopy}>
+                                <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none">
+                                    Copy to Clipboard
+                                </button>
+                            </CopyToClipboard>
+                        </div>
                     </div>
+
                 </div>
+                <ToastContainer />
             </div>
         </>
     );
