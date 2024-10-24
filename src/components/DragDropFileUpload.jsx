@@ -36,7 +36,7 @@ const DragDropFileUpload = () => {
 
     // Perform the fetch request
     fetch('http://127.0.0.1:80/uploadImage', requestOptions)
-      .then((response) => response.text())
+      .then((response) => response.json())
       .then((result) => {
         console.log(result);
         setLoading(false); // Stop loading after upload
