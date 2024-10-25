@@ -78,9 +78,9 @@ const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview })
     return (
         <>
             <div className="h-screen w-screen flex flex-col justify-center items-center text-slate-200">
-                <div className="relative flex flex-col md:flex-row md:space-x-6 w-full max-w-7xl h-full py-3 justify-center items-center">
+                <div className="relative flex flex-col md:flex-row md:space-x-6 w-10/12 lg:w-full max-w-7xl h-full py-3 justify-center items-center">
                     {/* Image with overlay container */}
-                    <div className="relative flex justify-center w-full md:w-2/4 max-h-full">
+                    <div className="relative flex justify-center  md:w-2/4 max-h-full">
                         <img
                             ref={imgRef}
                             src={preview}
