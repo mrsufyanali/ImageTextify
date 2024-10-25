@@ -40,7 +40,7 @@ const DragDropFileUpload = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, se
     };
 
     // Perform the fetch request
-    fetch('http://65.20.83.137:80/uploadImage', requestOptions)
+    fetch('https://imagetextserver.mahmudrahman.me/uploadImage', requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result.solution);
