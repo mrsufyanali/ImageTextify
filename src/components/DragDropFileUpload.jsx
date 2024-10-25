@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { ClipLoader } from 'react-spinners';
-import {uploadIcon}  from '../assets';
+import { uploadIcon } from '../assets';
 
-const DragDropFileUpload = ({ocrSuccess, setOcrSuccess,ocrData, setOcrData,setPreview}) => {
+const DragDropFileUpload = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, setPreview }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -35,6 +35,8 @@ const DragDropFileUpload = ({ocrSuccess, setOcrSuccess,ocrData, setOcrData,setPr
       method: 'POST',
       body: formData,
       redirect: 'follow',
+      mode: "cors",
+      referrerPolicy: "no-referrer"
     };
 
     // Perform the fetch request
@@ -56,9 +58,8 @@ const DragDropFileUpload = ({ocrSuccess, setOcrSuccess,ocrData, setOcrData,setPr
     <div className="flex items-center justify-center h-screen">
       <div
         {...getRootProps()}
-        className={`w-80 p-6 rounded-lg shadow-lg border-dashed border-2 transition-all duration-150 ease-in-out ${
-          isDragActive ? 'border-blue-500  h-[100vh] w-[100vw]' : 'border-gray-600'
-        } bg-gray-800 flex flex-col items-center justify-center `}
+        className={`w-80 p-6 rounded-lg shadow-lg border-dashed border-2 transition-all duration-150 ease-in-out ${isDragActive ? 'border-blue-500  h-[100vh] w-[100vw]' : 'border-gray-600'
+          } bg-gray-800 flex flex-col items-center justify-center `}
       >
         <input {...getInputProps()} />
         <div className="text-white">
