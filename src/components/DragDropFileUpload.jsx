@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { ClipLoader } from 'react-spinners';
-import { uploadIcon } from '../assets';
+import { arrowIcon, logo, uploadIcon } from '../assets';
 
 const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrData, setPreview }) => {
   const [file, setFile] = useState(null);
@@ -46,6 +46,7 @@ const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrD
           const es = new EventSource(`http://localhost:8000/queueStatus?request_id=${result.request_id}`);
           es.onmessage = (event) => {
             const position = parseInt(event.data);
+
             setQueuePosition(position);
 
             if (position === 0) {
@@ -96,21 +97,29 @@ const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrD
   }, [eventSource]);
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-900">
+      <div className="text-white flex flex-col items-center mb-8">
+        <img src={logo} alt="ImageTextify Logo" className="w-12 h-12 mb-2" />
+        <div className="motto text-center">
+          <h2 className="text-2xl font-bold">ImageTextify</h2>
+          <p className="text-sm text-slate-500 mt-1">-Turn images into words, effortlessly!📜</p>
+        </div>
+      </div>
       <div
         {...getRootProps()}
-        className={`w-80 p-6 rounded-lg shadow-lg border-dashed border-2 transition-all duration-150 ease-in-out ${isDragActive ? 'border-blue-500 h-[100vh] w-[100vw]' : 'border-gray-600'
-          } bg-gray-800 flex flex-col items-center justify-center `}
+        className={`w-80 py-16 px-6 rounded-lg shadow-lg border-dashed border-2 transition-all duration-150 ease-in-out ${
+          isDragActive ? 'border-blue-500 h-[100vh] w-[100vw]' : 'border-gray-600'
+        } bg-gray-800 flex flex-col items-center justify-center`}
       >
         <input {...getInputProps()} />
         <div className="text-white">
           {isDragActive ? (
             <div className="flex flex-col items-center justify-center">
-              <img src={uploadIcon} className='w-20' alt="upload icon" srcset="" />
+              <img src={uploadIcon} className="w-20" alt="Upload Icon" />
               <p>Drop the files here...</p>
             </div>
           ) : (
-            <p>Drag n drop some files here, or click to select files</p>
+            <p>Drag and drop some files here, or click to select files</p>
           )}
         </div>
         {file && (
@@ -127,13 +136,21 @@ const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrD
         )}
       </div>
       {file && (
-        <button
-          onClick={handleSubmit}
-          className="ml-2 mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none"
-          disabled={loading}  // Disable button to prevent duplicate submissions
-        >
-          {loading ? <ClipLoader color="#fff" size={20} /> : 'Submit'}
-        </button>
+        <div className="w-80">
+          <button
+            onClick={handleSubmit}
+            className="flex justify-center items-center mt-2 w-full bg-cyan-900 text-white px-4 py-2 rounded-lg hover:bg-cyan-950 focus:outline-none"
+            disabled={loading}
+          >
+            {loading ? (
+              <ClipLoader color="#fff" size={20} />
+            ) : (
+              <>
+                <img src={arrowIcon} alt="Arrow Icon" className="w-8 h-8" />Submit
+              </>
+            )}
+          </button>
+        </div>
       )}
       {queuePosition !== null && (
         <div className="mt-4 text-white">
@@ -144,6 +161,7 @@ const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrD
       )}
     </div>
   );
+  
 };
 
 export default DragDropFileUpload;
