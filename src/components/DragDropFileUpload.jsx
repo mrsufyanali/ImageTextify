@@ -33,7 +33,7 @@ const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrD
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch('http://localhost:8000/uploadImage', {
+    fetch('https://imagetextserver.mahmudrahman.me/uploadImage', {
       method: 'POST',
       body: formData,
     })
@@ -43,7 +43,7 @@ const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrD
           setRequestId(result.request_id);
 
           // Start SSE connection for queue updates
-          const es = new EventSource(`http://localhost:8000/queueStatus?request_id=${result.request_id}`);
+          const es = new EventSource(`https://imagetextserver.mahmudrahman.me/queueStatus?request_id=${result.request_id}`);
           es.onmessage = (event) => {
             const position = parseInt(event.data);
 
@@ -54,7 +54,7 @@ const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrD
               es.close();
               setEventSource(null);
 
-              fetch(`http://localhost:8000/processImage/${result.request_id}`, { method: 'POST' })
+              fetch(`https://imagetextserver.mahmudrahman.me/processImage/${result.request_id}`, { method: 'POST' })
                 .then((res) => res.json())
                 .then((data) => {
                   setLoading(false);
