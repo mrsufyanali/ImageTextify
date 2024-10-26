@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import BoxOverlay from './BoxOverlay';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
-const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview }) => {
+
+const ResultView = ({toast, ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview }) => {
     const imgRef = useRef(null);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [scaledData, setScaledData] = useState([]);
@@ -138,7 +137,6 @@ const ResultView = ({ ocrSuccess, setOcrSuccess, ocrData, setOcrData, preview })
                     </div>
 
                 </div>
-                <ToastContainer />
             </div>
         </>
     );
