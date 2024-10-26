@@ -6,9 +6,7 @@ import { arrowIcon, logo, uploadIcon } from '../assets';
 const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrData, setPreview }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [queuePosition, setQueuePosition] = useState(null);
-  const [requestId, setRequestId] = useState(null);
-  const [eventSource, setEventSource] = useState(null);
+
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: 'image/*',
@@ -27,74 +25,40 @@ const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrD
   });
 
   const handleSubmit = () => {
-    if (!file || loading) return;
+    if (!file) return;
 
     setLoading(true);
+
+    // Create a new FormData object
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch('https://imagetextserver.mahmudrahman.me/uploadImage', {
+    // Set the request options
+    const requestOptions = {
       method: 'POST',
       body: formData,
-    })
+      redirect: 'follow',
+      mode: "cors",
+      referrerPolicy: "no-referrer"
+    };
+
+    // Perform the fetch request
+    fetch('https://imagetextserver.mahmudrahman.me/uploadImage', requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        if (result.request_id) {
-          setRequestId(result.request_id);
-
-          // Start SSE connection for queue updates
-          const es = new EventSource(`https://imagetextserver.mahmudrahman.me/queueStatus?request_id=${result.request_id}`);
-          es.onmessage = (event) => {
-            const position = parseInt(event.data);
-
-            setQueuePosition(position);
-
-            if (position === 0) {
-              // When it's the user's turn, close SSE and initiate the processing request only once
-              es.close();
-              setEventSource(null);
-
-              fetch(`https://imagetextserver.mahmudrahman.me/processImage/${result.request_id}`, { method: 'POST' })
-                .then((res) => res.json())
-                .then((data) => {
-                  setLoading(false);
-                  setOcrSuccess(true);
-                  setOcrData(data.solution);
-                })
-                .catch((error) => {
-                  console.error('Error processing image:', error);
-                  toast.error('Error processing image. Please try again.');
-                  setLoading(false);
-                });
-            }
-          };
-
-          es.onerror = () => {
-            es.close();
-            setLoading(false);
-            setEventSource(null);
-            toast.error('Error with server connection.');
-          };
-
-          setEventSource(es);
-        } else {
-          throw new Error('Failed to upload');
-        }
+        console.log(result.solution);
+        setLoading(false); // Stop loading after upload
+        setOcrSuccess(true);
+        setOcrData(result.solution)
       })
       .catch((error) => {
-        toast.error('Error uploading file. Please try again.');
-        setLoading(false);
+        console.error('Error:', error);
+        toast.error("Error processing image, Please try again later")
+        setLoading(false); // Stop loading on error
       });
   };
 
-  useEffect(() => {
-    return () => {
-      // Ensure SSE connection is closed on component unmount
-      if (eventSource) {
-        eventSource.close();
-      }
-    };
-  }, [eventSource]);
+
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-900">
@@ -152,11 +116,9 @@ const DragDropFileUpload = ({ toast, ocrSuccess, setOcrSuccess, ocrData, setOcrD
           </button>
         </div>
       )}
-      {queuePosition !== null && (
+      {loading  && (
         <div className="mt-4 text-white">
-          {queuePosition > 0
-            ? `Your position in the queue: ${queuePosition}. Please wait for your turn...`
-            : 'Processing your file...'}
+            Processing your file...
         </div>
       )}
     </div>
