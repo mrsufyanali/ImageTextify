@@ -23,8 +23,8 @@ This is the frontend component of **imageTextify**, a user-friendly web app that
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/Udoy2/ImageTextify_Server.git
-    cd ImageTextify_Server
+    git clone https://github.com/Udoy2/ImageTextify.git
+    cd ImageTextify
     ```
 
 2. **Install dependencies**:
@@ -39,7 +39,7 @@ To start a development server:
 ```bash
 npm run dev
 ```
-The app will be available at `http://localhost:port`.
+The app will be available at `http://localhost:5173`.
 
 
 
